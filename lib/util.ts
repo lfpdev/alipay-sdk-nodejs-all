@@ -87,14 +87,14 @@ function sign(method: string, params: any = {}, config: AlipaySdkConfig): any {
   if (bizContent) {
     // AES加密
     if (params.needEncrypt) {
-      if (!config.encryptKey) {
+      if (!config.encryptKey) { // 开发设置中通过 接口内容加密方式 设置
         throw new Error('请设置encryptKey参数');
       }
 
       signParams.encryptType = 'AES';
       signParams.bizContent = aesEncrypt(
         snakeCaseKeys(bizContent),
-        config.encryptKey,
+        config.encryptKey, // 通过私钥加密内容
       );
     } else {
       signParams.bizContent = JSON.stringify(snakeCaseKeys(bizContent));
@@ -116,7 +116,7 @@ function sign(method: string, params: any = {}, config: AlipaySdkConfig): any {
 
   // 计算签名
   const sign = crypto.createSign(ALIPAY_ALGORITHM_MAPPING[config.signType])
-    .update(signStr, 'utf8').sign(config.privateKey, 'base64');
+    .update(signStr, 'utf8').sign(config.privateKey, 'base64'); // 私钥签名，阿里云用上传的公钥解密
 
   return Object.assign(decamelizeParams, { sign });
 }
